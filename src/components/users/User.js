@@ -1,47 +1,43 @@
-import React, { Fragment, Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Fragment, useEffect, useContext } from 'react';
 import Repos from '../repos/Repos';
 import Spinner from '../layout/Spinner';
 import {Link} from 'react-router-dom';
+import GithubContext from '../../context/github/githubContext';
 
-export class User extends Component {
+const User = ({match}) => {
     
-    componentDidMount(){
-        this.props.getUser(this.props.match.params.login);
-        this.props.getUserRepos(this.props.match.params.login);
+    const githubContext = useContext(GithubContext);
 
-    }
-    
-    static propTypes = {
-        loading: PropTypes.bool,
-        user: PropTypes.object.isRequired,
-        getUser: PropTypes.func.isRequired,
-        getUserRepos: PropTypes.func.isRequired,
-        repos: PropTypes.array.isRequired
-    }
+    const {getUser, loading, user, repos, getUserRepos} = githubContext;
 
-    render() {
-        const {
-            name, 
-            avatar_url, 
-            location, 
-            bio, 
-            blog,
-            company, 
-            login, 
-            html_url, 
-            followers, 
-            following, 
-            public_repos, 
-            public_gists, 
-            hireable
-        } = this.props.user;
+    useEffect(() => {
+        getUser(match.params.login);
+        getUserRepos(match.params.login);
+        //eslint-disable-next-line
+    },[]); //To mimic the behaviour of componentDidMount() include the empty brackets
 
-        const {loading} = this.props;
+    const {
+        name, 
+        avatar_url, 
+        location, 
+        bio, 
+        blog,
+        company, 
+        login, 
+        html_url, 
+        followers, 
+        following, 
+        public_repos, 
+        public_gists, 
+        hireable
+    } = user;
 
-        if(loading) return <Spinner />
+    console.log("user", user);
 
-        return <Fragment>
+    if(loading) return <Spinner />
+
+    return (
+        <Fragment>
             <Link to='/' className='btn btn-light'>Back to Search</Link>
             Hireable: {''}
             {hireable ? 
@@ -97,9 +93,9 @@ export class User extends Component {
                     <div className="badge badge-light">Public Repos: {public_repos}</div>
                     <div className="badge badge-dark">Gist: {public_gists}</div>
             </div>
-            <Repos repos={this.props.repos}/>
+            <Repos repos={repos}/>
         </Fragment>
-    }
+    )
 }
 
 export default User
